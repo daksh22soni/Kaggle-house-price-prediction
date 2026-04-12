@@ -45,10 +45,6 @@ Accurate real estate price estimation is a high-value, data-rich problem influen
 - Instrument the application with **Prometheus metrics** and visualise system behaviour through a **Grafana dashboard**.
 - Apply **Agile practices** (iterative commits, fast-fail pipelines, short feedback loops) throughout the development lifecycle.
 
-### GitHub Repository
-
-🔗 [https://github.com/AdityaMMantri/Kaggle-House-Price-Prediction](https://github.com/AdityaMMantri/Kaggle-House-Price-Prediction.git)
-
 ---
 
 ## 2. Project Architecture
