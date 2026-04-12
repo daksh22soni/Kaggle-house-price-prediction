@@ -158,7 +158,7 @@ python --version
 ### Step 1 — Clone the Repository
 
 ```bash
-git clone https://github.com/AdityaMMantri/Kaggle-House-Price-Prediction.git
+git clone https://github.com/daksh22soni/Kaggle-house-price-prediction.git
 cd Kaggle-House-Price-Prediction
 ```
 
