@@ -52,52 +52,55 @@ Accurate real estate price estimation is a high-value, data-rich problem influen
 ### System Workflow
 
 ```
-User Input (Streamlit UI)
-        │
-        ▼
-Feature Preprocessing (src/)
-        │
-        ▼
-┌───────────────────────────────┐
-│     Stacked Ensemble Model    │
-│  ┌──────────┐  ┌───────────┐  │
-│  │ElasticNet│  │  XGBoost  │  │
-│  └──────────┘  └───────────┘  │
-│        ┌──────────────┐       │
-│        │   CatBoost   │       │
-│        └──────────────┘       │
-│              │                │
-│       Meta-Model (Stacker)    │
-└───────────────────────────────┘
-        │
-        ▼
-Predicted Sale Price (USD)
-        │
-        ▼
+     User Input (Streamlit UI)
+                 │
+                 ▼
+    Feature Preprocessing (src/)
+                 │
+                 ▼
+┌──────────────────────────────────┐
+│       Stacked Ensemble Model     │
+│                                  │
+│  ┌────────────┐  ┌───────────┐   │
+│  │ ElasticNet │  │  XGBoost  │   │
+│  └────────────┘  └───────────┘   │
+│         ┌───────────────┐        │
+│         │   CatBoost    │        │
+│         └───────────────┘        │
+│                │                 │
+│    Meta-Model (Stacker)          │
+└──────────────────────────────────┘
+                 │
+                 ▼
+     Predicted Sale Price (USD)
+                 │
+                 ▼
 Prometheus /metrics endpoint (port 8000)
-        │
-        ▼
-Grafana Dashboard (port 3000)
+                 │
+                 ▼
+    Grafana Dashboard (port 3000)
 ```
 
 ### DevOps Pipeline Overview
 
 ```
-git push → GitHub → Jenkins (Webhook)
-                        │
-              ┌─────────▼──────────┐
-              │  Clone Repository  │
-              │  Build Docker Image│
-              │  Stop Old Container│
-              │  Run New Container │
-              │  Health Check      │
-              └────────────────────┘
-                        │
-              Docker Container (port 8501)
-                        │
-              Prometheus Scrape (port 8000)
-                        │
-              Grafana Dashboard (port 3000)
+           git push ──► GitHub ──► Jenkins (Webhook)
+                              │
+                 ┌────────────▼─────────────┐
+                 │                          │
+                 │   1. Clone Repository    │
+                 │   2. Build Docker Image  │
+                 │   3. Stop Old Container  │
+                 │   4. Run New Container   │
+                 │   5. Health Check        │
+                 │                          │
+                 └────────────┬─────────────┘
+                              │
+                 Docker Container (port 8501)
+                              │
+                 Prometheus Scrape (port 8000)
+                              │
+                 Grafana Dashboard (port 3000)
 ```
 
 ### Modules and Components
@@ -153,9 +156,15 @@ python --version
 # Expected: Python 3.10.x  or  Python 3.11.x
 ```
 
+> ⚠️ All the mentioned software are required to successfully run the repository. You can download them by clicking the respective application logos provided in the description section above.
+
 ---
 
-### Step 1 — Clone the Repository
+You can run this project using three different methods. Follow the steps under each method accordingly.
+
+### Global Step — Clone the Repository
+
+Before proceeding with any method, clone the repository to your local machine:
 
 ```bash
 git clone https://github.com/daksh22soni/Kaggle-house-price-prediction.git
@@ -164,47 +173,101 @@ cd Kaggle-House-Price-Prediction
 
 ---
 
-### Step 2 — Set Up a Virtual Environment *(Recommended)*
+#### Method 1: Using Jenkins
 
-Using a virtual environment isolates project dependencies from your system Python installation.
+**Required Plugins:** Build Timeout, Docker Pipeline, Docker Plugin, Git, Git Client, GitHub Plugin, GitHub Integration Plugin, Pipeline Graph Analysis Plugin, Prometheus Metrics Plugin.
 
-**On macOS / Linux:**
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
+Step 1: In Jenkins, create a **New Item** and select **Pipeline** as the project type.
 
-**On Windows:**
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
+Step 2: Under the build trigger settings, configure the pipeline to trigger **from SCM**.
 
-You should see `(venv)` prefixed in your terminal prompt, confirming activation.
+Step 3: Select **Git** and paste the repository URL:
+   ```
+   https://github.com/daksh22soni/Kaggle-house-price-prediction.git
+   ```
+
+Step 4: Change the branch from `master` to `main`.
+
+Step 5: Click **Save**, then click **Build Now** to trigger the pipeline.
+
+Step 6: Once the build completes, open the following in your browser:
+   - Streamlit Dashboard: `http://localhost:8501`
+   - Prometheus Metrics: `http://localhost:8000`
+
+Step 7: Copy the `prometheus.yml` file from the repository and paste it into your local Prometheus installation directory, replacing the existing configuration file.
+
+Step 8: Navigate to your Prometheus installation directory and run the following command:
+   ```bash
+   ./prometheus.exe --config.file=prometheus.yml
+   ```
+
+Step 9: Open `http://localhost:9090/targets` — you should see **3 endpoints** with status **UP**.
 
 ---
 
-### Step 3 — Install Dependencies
+#### Method 2: Using Docker
 
-```bash
-pip install -r requirements.txt
-```
+Step 1: Open **Docker Desktop** and ensure the Docker daemon is running.
 
-> **Note:** The dependency stack includes large ML packages (XGBoost, CatBoost, PyTorch-related libraries). Installation may take a few minutes depending on your network speed.
+Step 2: Navigate to the cloned repository folder and open the `Kaggle-House-Price-Prediction` directory.
+
+Step 3: Open a command prompt in that directory.
+
+Step 4: Build the Docker image by running:
+   ```bash
+   docker build -t streamlit_final_check .
+   ```
+
+Step 5: Start the container by running:
+   ```bash
+   docker run -d --name house-price-container2 -p 8502:8501 -p 8000:8000 streamlit_final_check
+   ```
+
+Step 6: Open the Streamlit dashboard in your browser at:
+   ```
+   http://localhost:8502
+   ```
+
+Step 7: Copy the `prometheus.yml` file from the repository and paste it into your local Prometheus installation directory, replacing the existing configuration file.
+
+Step 8: Navigate to your Prometheus installation directory and run the following command:
+   ```bash
+   ./prometheus.exe --config.file=prometheus.yml
+   ```
+
+Step 9: Open `http://localhost:9090/targets` — you should see **3 endpoints** with status **UP**.
 
 ---
 
-### Step 4 — (Optional) Docker Setup
+#### Method 3: Using Streamlit
 
-If you prefer to run the application in a Docker container (recommended for production-like deployment):
+Step 1: Navigate to the cloned repository folder and open the `Kaggle-House-Price-Prediction` directory.
 
-```bash
-# Build the Docker image
-docker build -t house-price-app .
+Step 2: Open a command prompt in that directory.
 
-# Run the container
-docker run -d -p 8501:8501 --name house-price-container house-price-app
-```
+Step 3: Install all required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+Step 4: Launch the Streamlit application:
+   ```bash
+   streamlit run app/app.py
+   ```
+
+Step 5: Open the Streamlit dashboard in your browser at:
+   ```
+   http://localhost:8501
+   ```
+
+Step 6: Copy the `prometheus.yml` file from the repository and paste it into your local Prometheus installation directory, replacing the existing configuration file.
+
+Step 7: Navigate to your Prometheus installation directory and run the following command:
+   ```bash
+   ./prometheus.exe --config.file=prometheus.yml
+   ```
+
+Step 8: Open `http://localhost:9090/targets` — you should see **3 endpoints** with status **UP**.
 
 ---
 
@@ -359,12 +422,12 @@ Additional notes:
 
 ### Team Members
 
-| Name | SAP ID | Role |
-|---|---|---|
-| **Aditya Madhav Mantri** | 70562300021 | ML Modelling, Repository Management, CI/CD |
-| **Daksh Soni** | 70562300080 | DevOps Integration, Prometheus Instrumentation |
-| **Priyanshu Nayak** | 70562300030 | Docker Containerisation, Streamlit Development |
-| **Simar Singh Khanuja** | 70562200088 | Grafana Dashboarding, Agile Documentation |
+| Name | SAP ID |
+|---|---|
+| **Aditya Madhav Mantri** | 70562300021 |
+| **Daksh Soni** | 70562300080 |
+| **Priyanshu Nayak** | 70562300030 |
+| **Simar Singh Khanuja** | 70562200088 |
 
 ### Academic Details
 
